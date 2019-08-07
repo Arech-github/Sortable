@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.10.0-rc3
+ * Sortable 1.0.0
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -57,20 +57,35 @@
     return _extends.apply(this, arguments);
   }
 
-  function _objectSpread(target) {
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i] != null ? arguments[i] : {};
-      var ownKeys = Object.keys(source);
 
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
+      if (i % 2) {
+        ownKeys(source, true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(source).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
       }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
     }
 
     return target;
@@ -132,7 +147,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance");
   }
 
-  var version = "1.10.0-rc3";
+  var version = "1.0.0";
 
   function userAgent(pattern) {
     return !!
@@ -797,7 +812,7 @@
         if (!sortable[plugin.pluginName]) return; // Fire global events if it exists in this sortable
 
         if (sortable[plugin.pluginName][eventNameGlobal]) {
-          _this.eventCanceled = !!sortable[plugin.pluginName][eventNameGlobal](_objectSpread({
+          _this.eventCanceled = !!sortable[plugin.pluginName][eventNameGlobal](_objectSpread2({
             sortable: sortable
           }, evt));
         } // Only fire plugin event if plugin is enabled in this sortable,
@@ -805,7 +820,7 @@
 
 
         if (sortable.options[plugin.pluginName] && sortable[plugin.pluginName][eventName]) {
-          _this.eventCanceled = _this.eventCanceled || !!sortable[plugin.pluginName][eventName](_objectSpread({
+          _this.eventCanceled = _this.eventCanceled || !!sortable[plugin.pluginName][eventName](_objectSpread2({
             sortable: sortable
           }, evt));
         }
@@ -895,7 +910,7 @@
     evt.originalEvent = originalEvent;
     evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
 
-    var allEventOptions = _objectSpread({}, eventOptions, PluginManager.getEventOptions(name, sortable));
+    var allEventOptions = _objectSpread2({}, eventOptions, {}, PluginManager.getEventOptions(name, sortable));
 
     for (var option in allEventOptions) {
       evt[option] = allEventOptions[option];
@@ -915,7 +930,7 @@
         originalEvent = _ref.evt,
         data = _objectWithoutProperties(_ref, ["evt"]);
 
-    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, _objectSpread({
+    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, _objectSpread2({
       dragEl: dragEl,
       parentEl: parentEl,
       ghostEl: ghostEl,
@@ -951,7 +966,7 @@
   };
 
   function _dispatchEvent(info) {
-    dispatchEvent(_objectSpread({
+    dispatchEvent(_objectSpread2({
       putSortable: putSortable,
       cloneEl: cloneEl,
       targetEl: dragEl,
@@ -1784,7 +1799,7 @@
       if (_silent) return;
 
       function dragOverEvent(name, extra) {
-        pluginEvent(name, _this, _objectSpread({
+        pluginEvent(name, _this, _objectSpread2({
           evt: evt,
           isOwner: isOwner,
           axis: vertical ? 'vertical' : 'horizontal',
@@ -2603,7 +2618,7 @@
         throw "Sortable: Mounted plugin must be a constructor function, not ".concat({}.toString.call(el));
       }
 
-      if (plugin.utils) Sortable.utils = _objectSpread({}, Sortable.utils, plugin.utils);
+      if (plugin.utils) Sortable.utils = _objectSpread2({}, Sortable.utils, {}, plugin.utils);
       PluginManager.mount(plugin);
     });
   };
@@ -2702,7 +2717,7 @@
         // Firefox and Chrome are good
 
         if (fallback || Edge || IE11OrLess || Safari) {
-          autoScroll(evt, this.options, elem, fallback); // Listener for pointer element change
+          autoScroll(evt, this.sortable.options, elem, fallback); // Listener for pointer element change
 
           var ogElemScroller = getParentAutoScrollElement(elem, true);
 
@@ -2717,7 +2732,7 @@
                 clearAutoScrolls();
               }
 
-              autoScroll(evt, _this.options, newElem, fallback);
+              autoScroll(evt, _this.sortable.options, newElem, fallback);
             }, 10);
             lastAutoScrollX = x;
             lastAutoScrollY = y;
@@ -2729,7 +2744,7 @@
             return;
           }
 
-          autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
+          autoScroll(evt, this.sortable.options, getParentAutoScrollElement(elem, false), false);
         }
       }
     };
@@ -3371,7 +3386,7 @@
           // Do not "unfold" after around dragEl if reverted
           if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
             var dragRect = getRect(dragEl$1),
-                multiDragIndex = index(dragEl$1, ':not(.' + this.options.selectedClass + ')');
+                multiDragIndex = index(dragEl$1, ':not(.' + sortable.options.selectedClass + ')');
             if (!initialFolding && options.animation) dragEl$1.thisAnimationDuration = null;
             toSortable.captureAnimationState();
 
