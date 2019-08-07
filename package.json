@@ -1,5 +1,5 @@
 {
-	"name": "sortablejs",
+	"name": "@timluot465/sortablejs",
 	"exportName": "Sortable",
 	"version": "1.0.0",
 	"devDependencies": {
